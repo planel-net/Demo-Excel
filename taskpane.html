@@ -161,6 +161,8 @@
     <script>
         const CONFIG = {
             sheetName: 'Feuil1',
+            configSheetName: 'mdp',
+            passwordCell: 'B2',
             contacts: { col: 'A', startRow: 2 },
             projets: { col: 'C', startRow: 2 },
             liaisons: { colContact: 'E', colProjet: 'F', startRow: 2 }
@@ -270,6 +272,18 @@
                     case 'deleteLiaison':
                         await deleteItem('liaison', message.index);
                         await loadAndSendData();
+                        break;
+
+                    case 'getProtectionStatus':
+                        await sendProtectionStatus();
+                        break;
+
+                    case 'protectWorkbook':
+                        await protectWorkbook();
+                        break;
+
+                    case 'unprotectWorkbook':
+                        await unprotectWorkbook(message.password);
                         break;
                 }
             } catch (error) {
@@ -409,6 +423,136 @@
 
                 await context.sync();
             });
+        }
+
+        // Protection functions
+        async function getStoredPassword() {
+            let password = null;
+            await Excel.run(async (context) => {
+                try {
+                    const configSheet = context.workbook.worksheets.getItem(CONFIG.configSheetName);
+                    const passwordRange = configSheet.getRange(CONFIG.passwordCell);
+                    passwordRange.load('values');
+                    await context.sync();
+                    if (passwordRange.values && passwordRange.values[0][0]) {
+                        password = passwordRange.values[0][0].toString();
+                    }
+                } catch (e) {
+                    console.log('Config sheet not found or error:', e);
+                }
+            });
+            return password;
+        }
+
+        async function sendProtectionStatus() {
+            try {
+                await Excel.run(async (context) => {
+                    const workbook = context.workbook;
+                    workbook.load('protection/protected');
+                    await context.sync();
+
+                    const isProtected = workbook.protection.protected;
+                    if (dialog) {
+                        dialog.messageChild(JSON.stringify({
+                            action: 'protectionStatus',
+                            isProtected: isProtected
+                        }));
+                    }
+                });
+            } catch (error) {
+                console.error('Error getting protection status:', error);
+            }
+        }
+
+        async function protectWorkbook() {
+            try {
+                const storedPassword = await getStoredPassword();
+                if (!storedPassword) {
+                    if (dialog) {
+                        dialog.messageChild(JSON.stringify({
+                            action: 'protectionResult',
+                            success: false,
+                            message: 'Mot de passe non configure dans la feuille _Config'
+                        }));
+                    }
+                    return;
+                }
+
+                await Excel.run(async (context) => {
+                    const workbook = context.workbook;
+                    workbook.protection.protect(storedPassword);
+                    await context.sync();
+
+                    if (dialog) {
+                        dialog.messageChild(JSON.stringify({
+                            action: 'protectionResult',
+                            success: true,
+                            message: 'Classeur protege',
+                            isProtected: true
+                        }));
+                    }
+                });
+            } catch (error) {
+                console.error('Error protecting workbook:', error);
+                if (dialog) {
+                    dialog.messageChild(JSON.stringify({
+                        action: 'protectionResult',
+                        success: false,
+                        message: 'Erreur: ' + error.message
+                    }));
+                }
+            }
+        }
+
+        async function unprotectWorkbook(userPassword) {
+            try {
+                const storedPassword = await getStoredPassword();
+                if (!storedPassword) {
+                    if (dialog) {
+                        dialog.messageChild(JSON.stringify({
+                            action: 'protectionResult',
+                            success: false,
+                            message: 'Mot de passe non configure'
+                        }));
+                    }
+                    return;
+                }
+
+                if (userPassword !== storedPassword) {
+                    if (dialog) {
+                        dialog.messageChild(JSON.stringify({
+                            action: 'protectionResult',
+                            success: false,
+                            message: 'Mot de passe incorrect'
+                        }));
+                    }
+                    return;
+                }
+
+                await Excel.run(async (context) => {
+                    const workbook = context.workbook;
+                    workbook.protection.unprotect(storedPassword);
+                    await context.sync();
+
+                    if (dialog) {
+                        dialog.messageChild(JSON.stringify({
+                            action: 'protectionResult',
+                            success: true,
+                            message: 'Classeur deprotege',
+                            isProtected: false
+                        }));
+                    }
+                });
+            } catch (error) {
+                console.error('Error unprotecting workbook:', error);
+                if (dialog) {
+                    dialog.messageChild(JSON.stringify({
+                        action: 'protectionResult',
+                        success: false,
+                        message: 'Erreur: ' + error.message
+                    }));
+                }
+            }
         }
     </script>
 </body>
