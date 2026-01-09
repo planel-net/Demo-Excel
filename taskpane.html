@@ -1158,12 +1158,13 @@
             if (chartContainer.style.display === 'none') {
                 chartContainer.style.display = 'block';
                 renderChart();
+                createExcelChart();
             } else {
                 chartContainer.style.display = 'none';
             }
         }
 
-        // Render bar chart
+        // Render bar chart in taskpane
         function renderChart() {
             const chartData = [
                 { label: 'Contacts', value: data.contacts.length, class: 'bar-contacts' },
@@ -1187,6 +1188,82 @@
             }).join('');
 
             document.getElementById('barChart').innerHTML = chartHtml;
+        }
+
+        // Create Excel chart on a new sheet
+        async function createExcelChart() {
+            try {
+                await Excel.run(async (context) => {
+                    const sheetName = 'Statistiques';
+                    let chartSheet;
+
+                    // Try to get existing sheet or create new one
+                    try {
+                        chartSheet = context.workbook.worksheets.getItem(sheetName);
+                        chartSheet.load('name');
+                        await context.sync();
+                        // Clear existing content
+                        chartSheet.getUsedRange().clear();
+                    } catch (e) {
+                        // Sheet doesn't exist, create it
+                        chartSheet = context.workbook.worksheets.add(sheetName);
+                    }
+
+                    // Add data for the chart
+                    const dataRange = chartSheet.getRange('A1:B4');
+                    dataRange.values = [
+                        ['Categorie', 'Nombre'],
+                        ['Contacts', data.contacts.length],
+                        ['Projets', data.projets.length],
+                        ['Liaisons', data.liaisons.length]
+                    ];
+
+                    // Format header row
+                    const headerRange = chartSheet.getRange('A1:B1');
+                    headerRange.format.font.bold = true;
+                    headerRange.format.fill.color = '#E2250C';
+                    headerRange.format.font.color = 'white';
+
+                    // Auto-fit columns
+                    dataRange.format.autofitColumns();
+
+                    // Delete existing charts
+                    const existingCharts = chartSheet.charts;
+                    existingCharts.load('items');
+                    await context.sync();
+
+                    for (let i = existingCharts.items.length - 1; i >= 0; i--) {
+                        existingCharts.items[i].delete();
+                    }
+
+                    // Create chart
+                    const chart = chartSheet.charts.add(
+                        Excel.ChartType.columnClustered,
+                        chartSheet.getRange('A1:B4'),
+                        Excel.ChartSeriesBy.columns
+                    );
+
+                    // Configure chart
+                    chart.title.text = 'Statistiques BDD';
+                    chart.title.format.font.size = 14;
+                    chart.title.format.font.bold = true;
+
+                    // Position and size
+                    chart.left = 150;
+                    chart.top = 10;
+                    chart.width = 400;
+                    chart.height = 300;
+
+                    // Activate the chart sheet
+                    chartSheet.activate();
+
+                    await context.sync();
+                    showAlert('Graphique Excel cree sur la feuille "Statistiques"', 'success');
+                });
+            } catch (error) {
+                console.error('Erreur creation graphique Excel:', error);
+                showAlert('Erreur lors de la creation du graphique Excel', 'error');
+            }
         }
     </script>
 </body>
