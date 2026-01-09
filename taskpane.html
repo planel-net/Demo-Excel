@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion BDD</title>
+
+    <!-- Office.js -->
+    <script src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 13px;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            padding: 15px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+            color: white;
+            padding: 15px;
+            margin: -15px -15px 15px -15px;
+        }
+
+        header h1 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 8px 12px;
+            border: none;
+            background: #e0e0e0;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: #0078d4;
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #d0d0d0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .section-header h2 {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: #0078d4;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #005a9e;
+        }
+
+        .btn-success {
+            background: #107c10;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #0b5c0b;
+        }
+
+        .btn-danger {
+            background: #d13438;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #a52a2d;
+        }
+
+        .btn-warning {
+            background: #ff8c00;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #cc7000;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .list-container {
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item:hover {
+            background: #f8f8f8;
+        }
+
+        .list-item-content {
+            flex: 1;
+        }
+
+        .list-item-title {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .list-item-subtitle {
+            font-size: 11px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .list-item-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .empty-state {
+            padding: 30px;
+            text-align: center;
+            color: #666;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 350px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-body {
+            padding: 15px;
+        }
+
+        .modal-footer {
+            padding: 15px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 500;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #d0d0d0;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #0078d4;
+            box-shadow: 0 0 0 2px rgba(0,120,212,0.2);
+        }
+
+        .alert {
+            padding: 10px 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 12px;
+        }
+
+        .alert-success {
+            background: #dff6dd;
+            color: #107c10;
+            border: 1px solid #107c10;
+        }
+
+        .alert-error {
+            background: #fde7e9;
+            color: #d13438;
+            border: 1px solid #d13438;
+        }
+
+        .alert-info {
+            background: #e5f1fb;
+            color: #0078d4;
+            border: 1px solid #0078d4;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f0f0f0;
+            border-top-color: #0078d4;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .badge-contact {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .badge-projet {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .refresh-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0078d4;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #666;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gestion BDD</h1>
+            <p>Contacts, Projets & Liaisons</p>
+        </header>
+
+        <div id="alertContainer"></div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="statContacts">-</div>
+                <div class="stat-label">Contacts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statProjets">-</div>
+                <div class="stat-label">Projets</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statLiaisons">-</div>
+                <div class="stat-label">Liaisons</div>
+            </div>
+        </div>
+
+        <div class="refresh-bar">
+            <button class="btn btn-primary btn-sm" onclick="loadAllData()">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                </svg>
+                Rafraichir
+            </button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('contacts')">Contacts</button>
+            <button class="tab" onclick="showTab('projets')">Projets</button>
+            <button class="tab" onclick="showTab('liaisons')">Liaisons</button>
+        </div>
+
+        <!-- Tab Contacts -->
+        <div id="tab-contacts" class="tab-content active">
+            <div class="section-header">
+                <h2>Liste des Contacts</h2>
+                <button class="btn btn-success btn-sm" onclick="openModal('contact')">+ Ajouter</button>
+            </div>
+            <div class="list-container" id="contactsList">
+                <div class="loading"><div class="spinner"></div></div>
+            </div>
+        </div>
+
+        <!-- Tab Projets -->
+        <div id="tab-projets" class="tab-content">
+            <div class="section-header">
+                <h2>Liste des Projets</h2>
+                <button class="btn btn-success btn-sm" onclick="openModal('projet')">+ Ajouter</button>
+            </div>
+            <div class="list-container" id="projetsList">
+                <div class="loading"><div class="spinner"></div></div>
+            </div>
+        </div>
+
+        <!-- Tab Liaisons -->
+        <div id="tab-liaisons" class="tab-content">
+            <div class="section-header">
+                <h2>Liaisons Contact-Projet</h2>
+                <button class="btn btn-success btn-sm" onclick="openModal('liaison')">+ Ajouter</button>
+            </div>
+            <div class="list-container" id="liaisonsList">
+                <div class="loading"><div class="spinner"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Formulaire</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="crudForm">
+                    <div id="formFields"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal()">Annuler</button>
+                <button class="btn btn-primary" onclick="saveItem()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Confirmer la suppression</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Voulez-vous vraiment supprimer cet élément ?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeDeleteModal()">Annuler</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration des colonnes Excel
+        const CONFIG = {
+            contacts: { col: 'A', startRow: 2, headerRow: 1 },
+            projets: { col: 'C', startRow: 2, headerRow: 1 },
+            liaisons: {
+                colContact: 'E',
+                colProjet: 'F',
+                startRow: 2,
+                headerRow: 1
+            }
+        };
+
+        // Données
+        let data = {
+            contacts: [],
+            projets: [],
+            liaisons: []
+        };
+
+        let currentType = null;
+        let editingIndex = null;
+        let deleteInfo = null;
+
+        // Initialize Office
+        Office.onReady((info) => {
+            if (info.host === Office.HostType.Excel) {
+                loadAllData();
+            } else {
+                showAlert('Cette application doit être exécutée dans Excel.', 'error');
+            }
+        });
+
+        // Load all data from Excel
+        async function loadAllData() {
+            try {
+                await Excel.run(async (context) => {
+                    const sheet = context.workbook.worksheets.getActiveWorksheet();
+
+                    // Load contacts (Column A)
+                    const contactsRange = sheet.getRange('A:A').getUsedRange();
+                    contactsRange.load('values');
+
+                    // Load projets (Column C)
+                    const projetsRange = sheet.getRange('C:C').getUsedRange();
+                    projetsRange.load('values');
+
+                    // Load liaisons (Columns E:F)
+                    const liaisonsRange = sheet.getRange('E:F').getUsedRange();
+                    liaisonsRange.load('values');
+
+                    await context.sync();
+
+                    // Parse contacts (skip header)
+                    data.contacts = contactsRange.values
+                        .slice(1)
+                        .map(row => row[0])
+                        .filter(val => val !== null && val !== '');
+
+                    // Parse projets (skip header)
+                    data.projets = projetsRange.values
+                        .slice(1)
+                        .map(row => row[0])
+                        .filter(val => val !== null && val !== '');
+
+                    // Parse liaisons (skip header)
+                    data.liaisons = liaisonsRange.values
+                        .slice(1)
+                        .filter(row => row[0] !== null && row[0] !== '' && row[1] !== null && row[1] !== '')
+                        .map(row => ({ contact: row[0], projet: row[1] }));
+
+                    updateStats();
+                    renderContacts();
+                    renderProjets();
+                    renderLiaisons();
+
+                    showAlert('Données chargées avec succès', 'success');
+                });
+            } catch (error) {
+                console.error(error);
+                showAlert('Erreur lors du chargement: ' + error.message, 'error');
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('statContacts').textContent = data.contacts.length;
+            document.getElementById('statProjets').textContent = data.projets.length;
+            document.getElementById('statLiaisons').textContent = data.liaisons.length;
+        }
+
+        // Render contacts list
+        function renderContacts() {
+            const container = document.getElementById('contactsList');
+            if (data.contacts.length === 0) {
+                container.innerHTML = '<div class="empty-state">Aucun contact</div>';
+                return;
+            }
+
+            container.innerHTML = data.contacts.map((contact, idx) => `
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="list-item-title">${contact}</div>
+                        <div class="list-item-subtitle">${countLiaisons('contact', contact)} projet(s) associé(s)</div>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="btn btn-warning btn-sm" onclick="editItem('contact', ${idx})">Modifier</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteItem('contact', ${idx})">Suppr.</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render projets list
+        function renderProjets() {
+            const container = document.getElementById('projetsList');
+            if (data.projets.length === 0) {
+                container.innerHTML = '<div class="empty-state">Aucun projet</div>';
+                return;
+            }
+
+            container.innerHTML = data.projets.map((projet, idx) => `
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="list-item-title">${projet}</div>
+                        <div class="list-item-subtitle">${countLiaisons('projet', projet)} contact(s) associé(s)</div>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="btn btn-warning btn-sm" onclick="editItem('projet', ${idx})">Modifier</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteItem('projet', ${idx})">Suppr.</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render liaisons list
+        function renderLiaisons() {
+            const container = document.getElementById('liaisonsList');
+            if (data.liaisons.length === 0) {
+                container.innerHTML = '<div class="empty-state">Aucune liaison</div>';
+                return;
+            }
+
+            container.innerHTML = data.liaisons.map((liaison, idx) => `
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="list-item-title">
+                            <span class="badge badge-contact">${liaison.contact}</span>
+                            <span style="margin: 0 5px;">↔</span>
+                            <span class="badge badge-projet">${liaison.projet}</span>
+                        </div>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="btn btn-warning btn-sm" onclick="editItem('liaison', ${idx})">Modifier</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteItem('liaison', ${idx})">Suppr.</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Count liaisons for an item
+        function countLiaisons(type, value) {
+            if (type === 'contact') {
+                return data.liaisons.filter(l => l.contact === value).length;
+            } else {
+                return data.liaisons.filter(l => l.projet === value).length;
+            }
+        }
+
+        // Show tab
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+
+        // Open modal
+        function openModal(type) {
+            currentType = type;
+            editingIndex = null;
+
+            const titles = {
+                contact: 'Nouveau Contact',
+                projet: 'Nouveau Projet',
+                liaison: 'Nouvelle Liaison'
+            };
+
+            document.getElementById('modalTitle').textContent = titles[type];
+            renderFormFields(type, null);
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        // Edit item
+        function editItem(type, index) {
+            currentType = type;
+            editingIndex = index;
+
+            const titles = {
+                contact: 'Modifier Contact',
+                projet: 'Modifier Projet',
+                liaison: 'Modifier Liaison'
+            };
+
+            let value;
+            if (type === 'contact') {
+                value = data.contacts[index];
+            } else if (type === 'projet') {
+                value = data.projets[index];
+            } else {
+                value = data.liaisons[index];
+            }
+
+            document.getElementById('modalTitle').textContent = titles[type];
+            renderFormFields(type, value);
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        // Render form fields
+        function renderFormFields(type, value) {
+            let html = '';
+
+            if (type === 'contact') {
+                html = `
+                    <div class="form-group">
+                        <label>Nom du contact</label>
+                        <input type="text" id="fieldName" value="${value || ''}" required>
+                    </div>
+                `;
+            } else if (type === 'projet') {
+                html = `
+                    <div class="form-group">
+                        <label>Nom du projet</label>
+                        <input type="text" id="fieldName" value="${value || ''}" required>
+                    </div>
+                `;
+            } else if (type === 'liaison') {
+                const selectedContact = value ? value.contact : '';
+                const selectedProjet = value ? value.projet : '';
+
+                html = `
+                    <div class="form-group">
+                        <label>Contact</label>
+                        <select id="fieldContact" required>
+                            <option value="">-- Sélectionner --</option>
+                            ${data.contacts.map(c => `<option value="${c}" ${c === selectedContact ? 'selected' : ''}>${c}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Projet</label>
+                        <select id="fieldProjet" required>
+                            <option value="">-- Sélectionner --</option>
+                            ${data.projets.map(p => `<option value="${p}" ${p === selectedProjet ? 'selected' : ''}>${p}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+            }
+
+            document.getElementById('formFields').innerHTML = html;
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            currentType = null;
+            editingIndex = null;
+        }
+
+        // Save item
+        async function saveItem() {
+            try {
+                if (currentType === 'contact') {
+                    const name = document.getElementById('fieldName').value.trim();
+                    if (!name) {
+                        showAlert('Veuillez entrer un nom', 'error');
+                        return;
+                    }
+
+                    if (editingIndex !== null) {
+                        // Update in Excel
+                        await updateContact(editingIndex, name);
+                    } else {
+                        // Add to Excel
+                        await addContact(name);
+                    }
+                } else if (currentType === 'projet') {
+                    const name = document.getElementById('fieldName').value.trim();
+                    if (!name) {
+                        showAlert('Veuillez entrer un nom', 'error');
+                        return;
+                    }
+
+                    if (editingIndex !== null) {
+                        await updateProjet(editingIndex, name);
+                    } else {
+                        await addProjet(name);
+                    }
+                } else if (currentType === 'liaison') {
+                    const contact = document.getElementById('fieldContact').value;
+                    const projet = document.getElementById('fieldProjet').value;
+
+                    if (!contact || !projet) {
+                        showAlert('Veuillez sélectionner un contact et un projet', 'error');
+                        return;
+                    }
+
+                    if (editingIndex !== null) {
+                        await updateLiaison(editingIndex, contact, projet);
+                    } else {
+                        await addLiaison(contact, projet);
+                    }
+                }
+
+                closeModal();
+                await loadAllData();
+            } catch (error) {
+                console.error(error);
+                showAlert('Erreur: ' + error.message, 'error');
+            }
+        }
+
+        // Add contact to Excel
+        async function addContact(name) {
+            await Excel.run(async (context) => {
+                const sheet = context.workbook.worksheets.getActiveWorksheet();
+                const newRow = data.contacts.length + 2; // +1 for header, +1 for new row
+                const cell = sheet.getRange(`A${newRow}`);
+                cell.values = [[name]];
+                await context.sync();
+            });
+            showAlert('Contact ajouté', 'success');
+        }
+
+        // Update contact in Excel
+        async function updateContact(index, name) {
+            await Excel.run(async (context) => {
+                const sheet = context.workbook.worksheets.getActiveWorksheet();
+                const row = index + 2; // +1 for header, +1 for 0-based index
+                const cell = sheet.getRange(`A${row}`);
+                cell.values = [[name]];
+                await context.sync();
+            });
+            showAlert('Contact mis à jour', 'success');
+        }
+
+        // Add projet to Excel
+        async function addProjet(name) {
+            await Excel.run(async (context) => {
+                const sheet = context.workbook.worksheets.getActiveWorksheet();
+                const newRow = data.projets.length + 2;
+                const cell = sheet.getRange(`C${newRow}`);
+                cell.values = [[name]];
+                await context.sync();
+            });
+            showAlert('Projet ajouté', 'success');
+        }
+
+        // Update projet in Excel
+        async function updateProjet(index, name) {
+            await Excel.run(async (context) => {
+                const sheet = context.workbook.worksheets.getActiveWorksheet();
+                const row = index + 2;
+                const cell = sheet.getRange(`C${row}`);
+                cell.values = [[name]];
+                await context.sync();
+            });
+            showAlert('Projet mis à jour', 'success');
+        }
+
+        // Add liaison to Excel
+        async function addLiaison(contact, projet) {
+            await Excel.run(async (context) => {
+                const sheet = context.workbook.worksheets.getActiveWorksheet();
+                const newRow = data.liaisons.length + 2;
+                const range = sheet.getRange(`E${newRow}:F${newRow}`);
+                range.values = [[contact, projet]];
+                await context.sync();
+            });
+            showAlert('Liaison ajoutée', 'success');
+        }
+
+        // Update liaison in Excel
+        async function updateLiaison(index, contact, projet) {
+            await Excel.run(async (context) => {
+                const sheet = context.workbook.worksheets.getActiveWorksheet();
+                const row = index + 2;
+                const range = sheet.getRange(`E${row}:F${row}`);
+                range.values = [[contact, projet]];
+                await context.sync();
+            });
+            showAlert('Liaison mise à jour', 'success');
+        }
+
+        // Delete item
+        function deleteItem(type, index) {
+            deleteInfo = { type, index };
+            document.getElementById('deleteModalOverlay').classList.add('active');
+        }
+
+        // Close delete modal
+        function closeDeleteModal() {
+            document.getElementById('deleteModalOverlay').classList.remove('active');
+            deleteInfo = null;
+        }
+
+        // Confirm delete
+        async function confirmDelete() {
+            if (!deleteInfo) return;
+
+            try {
+                const { type, index } = deleteInfo;
+
+                await Excel.run(async (context) => {
+                    const sheet = context.workbook.worksheets.getActiveWorksheet();
+                    const row = index + 2;
+
+                    if (type === 'contact') {
+                        const cell = sheet.getRange(`A${row}`);
+                        cell.delete(Excel.DeleteShiftDirection.up);
+                    } else if (type === 'projet') {
+                        const cell = sheet.getRange(`C${row}`);
+                        cell.delete(Excel.DeleteShiftDirection.up);
+                    } else if (type === 'liaison') {
+                        const range = sheet.getRange(`E${row}:F${row}`);
+                        range.delete(Excel.DeleteShiftDirection.up);
+                    }
+
+                    await context.sync();
+                });
+
+                showAlert('Élément supprimé', 'success');
+                closeDeleteModal();
+                await loadAllData();
+            } catch (error) {
+                console.error(error);
+                showAlert('Erreur lors de la suppression: ' + error.message, 'error');
+            }
+        }
+
+        // Show alert
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
