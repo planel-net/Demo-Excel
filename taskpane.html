@@ -5,10 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestion BDD</title>
 
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- Office.js -->
     <script src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
 
     <style>
+        /* Variables Malakoff Humanis */
+        :root {
+            /* Gamme Intense */
+            --mh-corail-brand: #E2250C;
+            --mh-bleu-dark: #1A283E;
+            --mh-violet-dark: #5514C7;
+            --mh-bleu-turquoise-dark: #006374;
+            --mh-rose-dark: #D81E88;
+            --mh-jaune-dark: #F9BD00;
+            --mh-vert-dark: #008275;
+            --mh-gris-sable-dark: #E4D8C4;
+            --mh-rose-chair-light: #F0B7A5;
+            --mh-gris-sable-light: #EDE8E6;
+
+            /* Gamme Douce */
+            --mh-corail-light: #F9D3CE;
+            --mh-bleu-light: #BDE3F2;
+            --mh-violet-light: #AA89E3;
+            --mh-vert-light: #03DFB2;
+            --mh-jaune-light: #F4EC5B;
+            --mh-gris-sable-light-60: #F4F0EF;
+
+            /* Gamme Pastel */
+            --mh-corail-pastel: #FFF2F0;
+            --mh-bleu-pastel: #E0F1F8;
+            --mh-gris-sable-pastel: #F9F7F6;
+
+            /* Sémantiques */
+            --cadrage-surface: #ffffff;
+            --cadrage-text: var(--mh-bleu-dark);
+            --cadrage-text-secondary: #666666;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,10 +54,11 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-size: 13px;
-            background: #f5f5f5;
-            color: #333;
+            background: linear-gradient(135deg, var(--mh-corail-pastel) 0%, var(--mh-gris-sable-pastel) 50%, var(--mh-bleu-pastel) 100%);
+            color: var(--cadrage-text);
+            min-height: 100vh;
         }
 
         .container {
@@ -27,16 +66,17 @@
         }
 
         header {
-            background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+            background: var(--mh-corail-brand);
             color: white;
             padding: 15px;
             margin: -15px -15px 15px -15px;
+            box-shadow: 0 2px 8px rgba(226, 37, 12, 0.3);
         }
 
         header h1 {
             font-size: 16px;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         header p {
@@ -44,111 +84,183 @@
             opacity: 0.9;
         }
 
-        .tabs {
+        /* Stats Cards */
+        .stats {
             display: flex;
-            gap: 5px;
+            gap: 10px;
             margin-bottom: 15px;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
         }
 
-        .tab {
-            padding: 8px 12px;
+        .stat-card {
+            flex: 1;
+            background: var(--cadrage-surface);
+            padding: 12px 8px;
+            border-radius: 0.75rem;
+            text-align: center;
+            border: 1px solid var(--mh-gris-sable-dark);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--mh-corail-brand);
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: var(--cadrage-text-secondary);
+            margin-top: 2px;
+            font-weight: 500;
+        }
+
+        /* Refresh Bar */
+        .refresh-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 14px;
             border: none;
-            background: #e0e0e0;
-            border-radius: 5px 5px 0 0;
+            border-radius: 0.5rem;
             cursor: pointer;
             font-size: 12px;
             font-weight: 500;
-            transition: all 0.2s;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .tab.active {
-            background: #0078d4;
+        .btn-primary {
+            background: var(--mh-bleu-dark);
             color: white;
         }
 
-        .tab:hover:not(.active) {
-            background: #d0d0d0;
+        .btn-primary:hover {
+            background: #0f1829;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(26, 40, 62, 0.3);
         }
 
+        .btn-success {
+            background: var(--mh-vert-dark);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #006960;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 130, 117, 0.3);
+        }
+
+        .btn-danger {
+            background: var(--mh-rose-dark);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c01a75;
+            transform: translateY(-1px);
+        }
+
+        .btn-warning {
+            background: var(--mh-jaune-dark);
+            color: var(--mh-bleu-dark);
+        }
+
+        .btn-warning:hover {
+            background: #e0aa00;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--cadrage-surface);
+            color: var(--mh-bleu-dark);
+            border: 2px solid var(--mh-bleu-dark);
+        }
+
+        .btn-secondary:hover {
+            background: var(--mh-bleu-dark);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 11px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .tab {
+            padding: 10px 16px;
+            background: var(--cadrage-surface);
+            border: 1px solid var(--mh-gris-sable-dark);
+            border-radius: 0.5rem 0.5rem 0 0;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            color: var(--cadrage-text-secondary);
+        }
+
+        .tab.active {
+            background: var(--mh-corail-brand);
+            color: white;
+            border-color: var(--mh-corail-brand);
+        }
+
+        .tab:hover:not(.active) {
+            background: var(--mh-corail-pastel);
+            border-color: var(--mh-corail-brand);
+            color: var(--mh-corail-brand);
+        }
+
+        /* Tab Content */
         .tab-content {
             display: none;
         }
 
         .tab-content.active {
             display: block;
+            animation: fadeIn 0.3s ease;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Sections */
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .section-header h2 {
             font-size: 14px;
-            color: #333;
+            color: var(--mh-bleu-dark);
+            font-weight: 600;
         }
 
-        .btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-primary {
-            background: #0078d4;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #005a9e;
-        }
-
-        .btn-success {
-            background: #107c10;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #0b5c0b;
-        }
-
-        .btn-danger {
-            background: #d13438;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #a52a2d;
-        }
-
-        .btn-warning {
-            background: #ff8c00;
-            color: white;
-        }
-
-        .btn-warning:hover {
-            background: #cc7000;
-        }
-
-        .btn-sm {
-            padding: 4px 8px;
-            font-size: 11px;
-        }
-
+        /* List Container */
         .list-container {
-            background: white;
-            border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: var(--cadrage-surface);
+            border-radius: 0.75rem;
+            border: 1px solid var(--mh-gris-sable-dark);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             max-height: 300px;
             overflow-y: auto;
         }
@@ -157,8 +269,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 12px;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--mh-gris-sable-light);
+            transition: background 0.2s ease;
         }
 
         .list-item:last-child {
@@ -166,7 +279,7 @@
         }
 
         .list-item:hover {
-            background: #f8f8f8;
+            background: var(--mh-gris-sable-light-60);
         }
 
         .list-item-content {
@@ -174,27 +287,68 @@
         }
 
         .list-item-title {
-            font-weight: 500;
-            color: #333;
+            font-weight: 600;
+            color: var(--mh-bleu-dark);
         }
 
         .list-item-subtitle {
             font-size: 11px;
-            color: #666;
-            margin-top: 2px;
+            color: var(--cadrage-text-secondary);
+            margin-top: 3px;
         }
 
         .list-item-actions {
             display: flex;
-            gap: 5px;
+            gap: 6px;
         }
 
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 2rem;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .badge-contact {
+            background: var(--mh-bleu-light);
+            color: var(--mh-bleu-turquoise-dark);
+        }
+
+        .badge-projet {
+            background: var(--mh-vert-light);
+            color: var(--mh-vert-dark);
+        }
+
+        /* Empty State */
         .empty-state {
-            padding: 30px;
+            padding: 40px 20px;
             text-align: center;
-            color: #666;
+            color: var(--cadrage-text-secondary);
         }
 
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--mh-gris-sable-dark);
+            border-top-color: var(--mh-corail-brand);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -202,7 +356,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(226, 37, 12, 0.3);
             justify-content: center;
             align-items: center;
             z-index: 100;
@@ -213,34 +367,42 @@
         }
 
         .modal {
-            background: white;
-            border-radius: 8px;
+            background: var(--cadrage-surface);
+            border-radius: 1rem;
             width: 90%;
             max-width: 350px;
             max-height: 80vh;
             overflow-y: auto;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(226, 37, 12, 0.2);
         }
 
         .modal-header {
             padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid var(--mh-gris-sable-dark);
+            background: var(--mh-corail-pastel);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-radius: 1rem 1rem 0 0;
         }
 
         .modal-header h3 {
             font-size: 14px;
             font-weight: 600;
+            color: var(--mh-bleu-dark);
         }
 
         .modal-close {
             background: none;
             border: none;
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
-            color: #666;
+            color: var(--cadrage-text-secondary);
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--mh-corail-brand);
         }
 
         .modal-body {
@@ -248,134 +410,161 @@
         }
 
         .modal-footer {
-            padding: 15px;
-            border-top: 1px solid #e0e0e0;
+            padding: 12px 15px;
+            border-top: 1px solid var(--mh-gris-sable-dark);
             display: flex;
             gap: 10px;
             justify-content: flex-end;
+            background: var(--mh-gris-sable-pastel);
+            border-radius: 0 0 1rem 1rem;
         }
 
+        /* Forms */
         .form-group {
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             font-weight: 500;
             font-size: 12px;
-            color: #333;
+            color: var(--mh-bleu-dark);
         }
 
         .form-group input,
         .form-group select {
             width: 100%;
-            padding: 8px 10px;
-            border: 1px solid #d0d0d0;
-            border-radius: 4px;
+            padding: 10px 12px;
+            background: var(--mh-gris-sable-pastel);
+            border: 1px solid var(--mh-gris-sable-dark);
+            border-radius: 0.5rem;
             font-size: 13px;
+            font-family: inherit;
+            color: var(--cadrage-text);
+            transition: all 0.2s;
         }
 
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #0078d4;
-            box-shadow: 0 0 0 2px rgba(0,120,212,0.2);
+            border-color: var(--mh-corail-brand);
+            box-shadow: 0 0 0 3px rgba(226, 37, 12, 0.15);
+            background: white;
         }
 
+        .form-group input::placeholder {
+            color: #999999;
+        }
+
+        /* Alerts */
         .alert {
-            padding: 10px 12px;
-            border-radius: 4px;
+            padding: 12px 14px;
+            border-radius: 0.5rem;
             margin-bottom: 15px;
             font-size: 12px;
+            font-weight: 500;
+            animation: fadeIn 0.3s ease;
         }
 
         .alert-success {
-            background: #dff6dd;
-            color: #107c10;
-            border: 1px solid #107c10;
+            background: var(--mh-vert-light);
+            border: 1px solid var(--mh-vert-dark);
+            color: var(--mh-vert-dark);
         }
 
         .alert-error {
-            background: #fde7e9;
-            color: #d13438;
-            border: 1px solid #d13438;
+            background: var(--mh-corail-light);
+            border: 1px solid var(--mh-corail-brand);
+            color: var(--mh-corail-brand);
         }
 
         .alert-info {
-            background: #e5f1fb;
-            color: #0078d4;
-            border: 1px solid #0078d4;
+            background: var(--mh-bleu-light);
+            border: 1px solid var(--mh-bleu-turquoise-dark);
+            color: var(--mh-bleu-turquoise-dark);
         }
 
-        .loading {
+        /* Chart Container */
+        .chart-container {
+            background: var(--cadrage-surface);
+            border-radius: 0.75rem;
+            border: 1px solid var(--mh-gris-sable-dark);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .chart-header {
+            padding: 12px 15px;
+            background: var(--mh-corail-pastel);
+            border-bottom: 1px solid var(--mh-gris-sable-dark);
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--mh-bleu-dark);
+            margin: 0;
+        }
+
+        .chart-body {
             padding: 20px;
         }
 
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid #f0f0f0;
-            border-top-color: #0078d4;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 500;
-        }
-
-        .badge-contact {
-            background: #e3f2fd;
-            color: #1565c0;
-        }
-
-        .badge-projet {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-
-        .refresh-bar {
+        .bar-chart {
             display: flex;
-            justify-content: flex-end;
-            margin-bottom: 10px;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 150px;
+            padding-top: 20px;
         }
 
-        .stats {
+        .bar-item {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .stat-card {
+            flex-direction: column;
+            align-items: center;
             flex: 1;
-            background: white;
-            padding: 10px;
-            border-radius: 6px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            max-width: 80px;
         }
 
-        .stat-value {
-            font-size: 20px;
-            font-weight: 600;
-            color: #0078d4;
+        .bar {
+            width: 50px;
+            border-radius: 6px 6px 0 0;
+            transition: height 0.5s ease;
+            position: relative;
         }
 
-        .stat-label {
-            font-size: 10px;
-            color: #666;
-            margin-top: 2px;
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--mh-bleu-dark);
+        }
+
+        .bar-label {
+            margin-top: 10px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--cadrage-text-secondary);
+        }
+
+        .bar-contacts {
+            background: linear-gradient(180deg, var(--mh-bleu-light) 0%, var(--mh-bleu-turquoise-dark) 100%);
+        }
+
+        .bar-projets {
+            background: linear-gradient(180deg, var(--mh-vert-light) 0%, var(--mh-vert-dark) 100%);
+        }
+
+        .bar-liaisons {
+            background: linear-gradient(180deg, var(--mh-violet-light) 0%, var(--mh-violet-dark) 100%);
         }
     </style>
 </head>
@@ -404,6 +593,12 @@
         </div>
 
         <div class="refresh-bar">
+            <button class="btn btn-secondary btn-sm" onclick="toggleChart()" style="margin-right: 8px;">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M4 11H2v3h2v-3zm5-4H7v7h2V7zm5-5h-2v12h2V2zm-2-1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1h-2zM6 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7zm-5 4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-3z"/>
+                </svg>
+                Graphique
+            </button>
             <button class="btn btn-primary btn-sm" onclick="loadAllData()">
                 <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
@@ -411,6 +606,17 @@
                 </svg>
                 Rafraichir
             </button>
+        </div>
+
+        <!-- Chart Container -->
+        <div id="chartContainer" class="chart-container" style="display: none;">
+            <div class="chart-header">
+                <h3>Statistiques</h3>
+                <button class="modal-close" onclick="toggleChart()">&times;</button>
+            </div>
+            <div class="chart-body">
+                <div class="bar-chart" id="barChart"></div>
+            </div>
         </div>
 
         <div class="tabs">
@@ -466,7 +672,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn" onclick="closeModal()">Annuler</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
                 <button class="btn btn-primary" onclick="saveItem()">Enregistrer</button>
             </div>
         </div>
@@ -480,10 +686,10 @@
                 <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Voulez-vous vraiment supprimer cet élément ?</p>
+                <p>Voulez-vous vraiment supprimer cet element ?</p>
             </div>
             <div class="modal-footer">
-                <button class="btn" onclick="closeDeleteModal()">Annuler</button>
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Annuler</button>
                 <button class="btn btn-danger" onclick="confirmDelete()">Supprimer</button>
             </div>
         </div>
@@ -492,6 +698,7 @@
     <script>
         // Configuration des colonnes Excel
         const CONFIG = {
+            sheetName: 'Feuil1', // Nom de la feuille de donnees (peut etre masquee)
             contacts: { col: 'A', startRow: 2, headerRow: 1 },
             projets: { col: 'C', startRow: 2, headerRow: 1 },
             liaisons: {
@@ -502,7 +709,12 @@
             }
         };
 
-        // Données
+        // Fonction pour obtenir la feuille de donnees (meme si masquee)
+        function getDataSheet(context) {
+            return context.workbook.worksheets.getItem(CONFIG.sheetName);
+        }
+
+        // Donnees
         let data = {
             contacts: [],
             projets: [],
@@ -518,7 +730,7 @@
             if (info.host === Office.HostType.Excel) {
                 loadAllData();
             } else {
-                showAlert('Cette application doit être exécutée dans Excel.', 'error');
+                showAlert('Cette application doit etre executee dans Excel.', 'error');
             }
         });
 
@@ -526,7 +738,7 @@
         async function loadAllData() {
             try {
                 await Excel.run(async (context) => {
-                    const sheet = context.workbook.worksheets.getActiveWorksheet();
+                    const sheet = getDataSheet(context);
 
                     // Load contacts (Column A)
                     const contactsRange = sheet.getRange('A:A').getUsedRange();
@@ -565,7 +777,7 @@
                     renderProjets();
                     renderLiaisons();
 
-                    showAlert('Données chargées avec succès', 'success');
+                    showAlert('Donnees chargees avec succes', 'success');
                 });
             } catch (error) {
                 console.error(error);
@@ -592,7 +804,7 @@
                 <div class="list-item">
                     <div class="list-item-content">
                         <div class="list-item-title">${contact}</div>
-                        <div class="list-item-subtitle">${countLiaisons('contact', contact)} projet(s) associé(s)</div>
+                        <div class="list-item-subtitle">${countLiaisons('contact', contact)} projet(s) associe(s)</div>
                     </div>
                     <div class="list-item-actions">
                         <button class="btn btn-warning btn-sm" onclick="editItem('contact', ${idx})">Modifier</button>
@@ -614,7 +826,7 @@
                 <div class="list-item">
                     <div class="list-item-content">
                         <div class="list-item-title">${projet}</div>
-                        <div class="list-item-subtitle">${countLiaisons('projet', projet)} contact(s) associé(s)</div>
+                        <div class="list-item-subtitle">${countLiaisons('projet', projet)} contact(s) associe(s)</div>
                     </div>
                     <div class="list-item-actions">
                         <button class="btn btn-warning btn-sm" onclick="editItem('projet', ${idx})">Modifier</button>
@@ -637,7 +849,7 @@
                     <div class="list-item-content">
                         <div class="list-item-title">
                             <span class="badge badge-contact">${liaison.contact}</span>
-                            <span style="margin: 0 5px;">↔</span>
+                            <span style="margin: 0 8px; color: var(--mh-corail-brand);">&#8596;</span>
                             <span class="badge badge-projet">${liaison.projet}</span>
                         </div>
                     </div>
@@ -716,14 +928,14 @@
                 html = `
                     <div class="form-group">
                         <label>Nom du contact</label>
-                        <input type="text" id="fieldName" value="${value || ''}" required>
+                        <input type="text" id="fieldName" value="${value || ''}" placeholder="Entrez le nom..." required>
                     </div>
                 `;
             } else if (type === 'projet') {
                 html = `
                     <div class="form-group">
                         <label>Nom du projet</label>
-                        <input type="text" id="fieldName" value="${value || ''}" required>
+                        <input type="text" id="fieldName" value="${value || ''}" placeholder="Entrez le nom..." required>
                     </div>
                 `;
             } else if (type === 'liaison') {
@@ -734,14 +946,14 @@
                     <div class="form-group">
                         <label>Contact</label>
                         <select id="fieldContact" required>
-                            <option value="">-- Sélectionner --</option>
+                            <option value="">-- Selectionner --</option>
                             ${data.contacts.map(c => `<option value="${c}" ${c === selectedContact ? 'selected' : ''}>${c}</option>`).join('')}
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Projet</label>
                         <select id="fieldProjet" required>
-                            <option value="">-- Sélectionner --</option>
+                            <option value="">-- Selectionner --</option>
                             ${data.projets.map(p => `<option value="${p}" ${p === selectedProjet ? 'selected' : ''}>${p}</option>`).join('')}
                         </select>
                     </div>
@@ -769,10 +981,8 @@
                     }
 
                     if (editingIndex !== null) {
-                        // Update in Excel
                         await updateContact(editingIndex, name);
                     } else {
-                        // Add to Excel
                         await addContact(name);
                     }
                 } else if (currentType === 'projet') {
@@ -792,7 +1002,7 @@
                     const projet = document.getElementById('fieldProjet').value;
 
                     if (!contact || !projet) {
-                        showAlert('Veuillez sélectionner un contact et un projet', 'error');
+                        showAlert('Veuillez selectionner un contact et un projet', 'error');
                         return;
                     }
 
@@ -814,73 +1024,73 @@
         // Add contact to Excel
         async function addContact(name) {
             await Excel.run(async (context) => {
-                const sheet = context.workbook.worksheets.getActiveWorksheet();
-                const newRow = data.contacts.length + 2; // +1 for header, +1 for new row
+                const sheet = getDataSheet(context);
+                const newRow = data.contacts.length + 2;
                 const cell = sheet.getRange(`A${newRow}`);
                 cell.values = [[name]];
                 await context.sync();
             });
-            showAlert('Contact ajouté', 'success');
+            showAlert('Contact ajoute', 'success');
         }
 
         // Update contact in Excel
         async function updateContact(index, name) {
             await Excel.run(async (context) => {
-                const sheet = context.workbook.worksheets.getActiveWorksheet();
-                const row = index + 2; // +1 for header, +1 for 0-based index
+                const sheet = getDataSheet(context);
+                const row = index + 2;
                 const cell = sheet.getRange(`A${row}`);
                 cell.values = [[name]];
                 await context.sync();
             });
-            showAlert('Contact mis à jour', 'success');
+            showAlert('Contact mis a jour', 'success');
         }
 
         // Add projet to Excel
         async function addProjet(name) {
             await Excel.run(async (context) => {
-                const sheet = context.workbook.worksheets.getActiveWorksheet();
+                const sheet = getDataSheet(context);
                 const newRow = data.projets.length + 2;
                 const cell = sheet.getRange(`C${newRow}`);
                 cell.values = [[name]];
                 await context.sync();
             });
-            showAlert('Projet ajouté', 'success');
+            showAlert('Projet ajoute', 'success');
         }
 
         // Update projet in Excel
         async function updateProjet(index, name) {
             await Excel.run(async (context) => {
-                const sheet = context.workbook.worksheets.getActiveWorksheet();
+                const sheet = getDataSheet(context);
                 const row = index + 2;
                 const cell = sheet.getRange(`C${row}`);
                 cell.values = [[name]];
                 await context.sync();
             });
-            showAlert('Projet mis à jour', 'success');
+            showAlert('Projet mis a jour', 'success');
         }
 
         // Add liaison to Excel
         async function addLiaison(contact, projet) {
             await Excel.run(async (context) => {
-                const sheet = context.workbook.worksheets.getActiveWorksheet();
+                const sheet = getDataSheet(context);
                 const newRow = data.liaisons.length + 2;
                 const range = sheet.getRange(`E${newRow}:F${newRow}`);
                 range.values = [[contact, projet]];
                 await context.sync();
             });
-            showAlert('Liaison ajoutée', 'success');
+            showAlert('Liaison ajoutee', 'success');
         }
 
         // Update liaison in Excel
         async function updateLiaison(index, contact, projet) {
             await Excel.run(async (context) => {
-                const sheet = context.workbook.worksheets.getActiveWorksheet();
+                const sheet = getDataSheet(context);
                 const row = index + 2;
                 const range = sheet.getRange(`E${row}:F${row}`);
                 range.values = [[contact, projet]];
                 await context.sync();
             });
-            showAlert('Liaison mise à jour', 'success');
+            showAlert('Liaison mise a jour', 'success');
         }
 
         // Delete item
@@ -903,7 +1113,7 @@
                 const { type, index } = deleteInfo;
 
                 await Excel.run(async (context) => {
-                    const sheet = context.workbook.worksheets.getActiveWorksheet();
+                    const sheet = getDataSheet(context);
                     const row = index + 2;
 
                     if (type === 'contact') {
@@ -920,7 +1130,7 @@
                     await context.sync();
                 });
 
-                showAlert('Élément supprimé', 'success');
+                showAlert('Element supprime', 'success');
                 closeDeleteModal();
                 await loadAllData();
             } catch (error) {
@@ -940,6 +1150,43 @@
             setTimeout(() => {
                 alert.remove();
             }, 3000);
+        }
+
+        // Toggle chart visibility
+        function toggleChart() {
+            const chartContainer = document.getElementById('chartContainer');
+            if (chartContainer.style.display === 'none') {
+                chartContainer.style.display = 'block';
+                renderChart();
+            } else {
+                chartContainer.style.display = 'none';
+            }
+        }
+
+        // Render bar chart
+        function renderChart() {
+            const chartData = [
+                { label: 'Contacts', value: data.contacts.length, class: 'bar-contacts' },
+                { label: 'Projets', value: data.projets.length, class: 'bar-projets' },
+                { label: 'Liaisons', value: data.liaisons.length, class: 'bar-liaisons' }
+            ];
+
+            const maxValue = Math.max(...chartData.map(d => d.value), 1);
+            const maxHeight = 120;
+
+            const chartHtml = chartData.map(item => {
+                const height = (item.value / maxValue) * maxHeight;
+                return `
+                    <div class="bar-item">
+                        <div class="bar ${item.class}" style="height: ${height}px;">
+                            <span class="bar-value">${item.value}</span>
+                        </div>
+                        <span class="bar-label">${item.label}</span>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('barChart').innerHTML = chartHtml;
         }
     </script>
 </body>
