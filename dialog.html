@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion BDD - Application</title>
+
+    <!-- Google Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Office.js for dialog communication -->
+    <script src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+
+    <style>
+        /* Variables Malakoff Humanis */
+        :root {
+            --mh-corail-brand: #E2250C;
+            --mh-bleu-dark: #1A283E;
+            --mh-violet-dark: #5514C7;
+            --mh-bleu-turquoise-dark: #006374;
+            --mh-rose-dark: #D81E88;
+            --mh-jaune-dark: #F9BD00;
+            --mh-vert-dark: #008275;
+            --mh-gris-sable-dark: #E4D8C4;
+            --mh-corail-light: #F9D3CE;
+            --mh-bleu-light: #BDE3F2;
+            --mh-violet-light: #AA89E3;
+            --mh-vert-light: #03DFB2;
+            --mh-corail-pastel: #FFF2F0;
+            --mh-bleu-pastel: #E0F1F8;
+            --mh-gris-sable-pastel: #F9F7F6;
+            --cadrage-surface: #ffffff;
+            --cadrage-text: var(--mh-bleu-dark);
+            --cadrage-text-secondary: #666666;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            background: linear-gradient(135deg, var(--mh-corail-pastel) 0%, var(--mh-gris-sable-pastel) 50%, var(--mh-bleu-pastel) 100%);
+            color: var(--cadrage-text);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background: var(--mh-corail-brand);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 8px rgba(226, 37, 12, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Stats Cards */
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: var(--cadrage-surface);
+            padding: 25px;
+            border-radius: 1rem;
+            text-align: center;
+            border: 1px solid var(--mh-gris-sable-dark);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--mh-bleu-turquoise-dark);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--cadrage-text-secondary);
+            margin-top: 5px;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .section {
+            background: var(--cadrage-surface);
+            border-radius: 1rem;
+            border: 1px solid var(--mh-gris-sable-dark);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 15px 20px;
+            background: var(--mh-bleu-dark);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header.contacts { background: var(--mh-bleu-turquoise-dark); }
+        .section-header.projets { background: var(--mh-vert-dark); }
+        .section-header.liaisons { background: var(--mh-violet-dark); }
+
+        .section-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .section-body {
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* List Items */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--mh-gris-sable-pastel);
+            border-radius: 0.5rem;
+            margin-bottom: 10px;
+            transition: background 0.2s;
+        }
+
+        .list-item:hover {
+            background: var(--mh-gris-sable-dark);
+        }
+
+        .list-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .item-name {
+            font-weight: 500;
+        }
+
+        .item-meta {
+            font-size: 12px;
+            color: var(--cadrage-text-secondary);
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--mh-corail-brand);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #c91f0a;
+        }
+
+        .btn-secondary {
+            background: var(--mh-bleu-dark);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #0f1825;
+        }
+
+        .btn-success {
+            background: var(--mh-vert-dark);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--mh-jaune-dark);
+            color: var(--mh-bleu-dark);
+        }
+
+        .btn-danger {
+            background: var(--mh-rose-dark);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-icon {
+            padding: 6px 10px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 1rem;
+            padding: 25px;
+            min-width: 400px;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            color: var(--mh-bleu-dark);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--mh-gris-sable-dark);
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--mh-corail-brand);
+            box-shadow: 0 0 0 3px var(--mh-corail-light);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Alerts */
+        .alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+        }
+
+        .alert {
+            padding: 12px 20px;
+            border-radius: 0.5rem;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .alert-success {
+            background: var(--mh-vert-light);
+            border: 1px solid var(--mh-vert-dark);
+            color: var(--mh-vert-dark);
+        }
+
+        .alert-error {
+            background: var(--mh-corail-light);
+            border: 1px solid var(--mh-corail-brand);
+            color: var(--mh-corail-brand);
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--cadrage-text-secondary);
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--mh-gris-sable-dark);
+            border-top-color: var(--mh-corail-brand);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--cadrage-text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div>
+                <h1>Gestion BDD</h1>
+                <p>Contacts, Projets & Liaisons</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="loadAllData()">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                    </svg>
+                    Rafraichir
+                </button>
+                <button class="btn btn-primary" onclick="closeDialog()">
+                    Fermer
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Stats -->
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="statContacts">-</div>
+                    <div class="stat-label">Contacts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statProjets">-</div>
+                    <div class="stat-label">Projets</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statLiaisons">-</div>
+                    <div class="stat-label">Liaisons</div>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Contacts Section -->
+                <div class="section">
+                    <div class="section-header contacts">
+                        <h2>Contacts</h2>
+                        <button class="btn btn-sm btn-warning" onclick="showAddModal('contact')">+ Ajouter</button>
+                    </div>
+                    <div class="section-body" id="contactsList">
+                        <div class="loading"><div class="spinner"></div> Chargement...</div>
+                    </div>
+                </div>
+
+                <!-- Projets Section -->
+                <div class="section">
+                    <div class="section-header projets">
+                        <h2>Projets</h2>
+                        <button class="btn btn-sm btn-warning" onclick="showAddModal('projet')">+ Ajouter</button>
+                    </div>
+                    <div class="section-body" id="projetsList">
+                        <div class="loading"><div class="spinner"></div> Chargement...</div>
+                    </div>
+                </div>
+
+                <!-- Liaisons Section -->
+                <div class="section">
+                    <div class="section-header liaisons">
+                        <h2>Liaisons</h2>
+                        <button class="btn btn-sm btn-warning" onclick="showAddModal('liaison')">+ Ajouter</button>
+                    </div>
+                    <div class="section-body" id="liaisonsList">
+                        <div class="loading"><div class="spinner"></div> Chargement...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Container -->
+    <div class="alert-container" id="alertContainer"></div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h3 id="modalTitle">Ajouter</h3>
+            <form id="modalForm" onsubmit="handleFormSubmit(event)">
+                <div id="formFields"></div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <h3>Confirmer la suppression</h3>
+            <p id="deleteMessage">Voulez-vous vraiment supprimer cet element ?</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Annuler</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let data = { contacts: [], projets: [], liaisons: [] };
+        let currentModal = { type: null, mode: null, index: null };
+        let deleteInfo = null;
+
+        // Initialize Office
+        Office.onReady((info) => {
+            if (info.host === Office.HostType.Excel) {
+                loadAllData();
+            }
+        });
+
+        // Close dialog
+        function closeDialog() {
+            Office.context.ui.messageParent(JSON.stringify({ action: 'close' }));
+        }
+
+        // Send message to parent and wait for response
+        function sendToParent(message) {
+            return new Promise((resolve) => {
+                const messageId = Date.now();
+                message.messageId = messageId;
+
+                const handler = (arg) => {
+                    try {
+                        const response = JSON.parse(arg.message);
+                        if (response.messageId === messageId) {
+                            resolve(response);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing response:', e);
+                    }
+                };
+
+                // Store handler for cleanup
+                window.currentHandler = handler;
+
+                Office.context.ui.messageParent(JSON.stringify(message));
+
+                // For responses, we'll use a different approach - polling
+                // Since dialog can't receive messages directly, we request data
+                setTimeout(() => resolve({ success: true }), 100);
+            });
+        }
+
+        // Load all data
+        async function loadAllData() {
+            try {
+                Office.context.ui.messageParent(JSON.stringify({ action: 'loadData' }));
+            } catch (error) {
+                console.error('Error requesting data:', error);
+                showAlert('Erreur de chargement', 'error');
+            }
+        }
+
+        // Receive data from parent
+        function receiveData(newData) {
+            data = newData;
+            updateUI();
+        }
+
+        // Update UI with data
+        function updateUI() {
+            // Update stats
+            document.getElementById('statContacts').textContent = data.contacts.length;
+            document.getElementById('statProjets').textContent = data.projets.length;
+            document.getElementById('statLiaisons').textContent = data.liaisons.length;
+
+            // Update contacts list
+            const contactsList = document.getElementById('contactsList');
+            if (data.contacts.length === 0) {
+                contactsList.innerHTML = '<div class="empty-state">Aucun contact</div>';
+            } else {
+                contactsList.innerHTML = data.contacts.map((c, i) => `
+                    <div class="list-item">
+                        <div>
+                            <div class="item-name">${c}</div>
+                            <div class="item-meta">${countLiaisons('contact', c)} projet(s)</div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-sm btn-warning btn-icon" onclick="showEditModal('contact', ${i})">
+                                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10z"/></svg>
+                            </button>
+                            <button class="btn btn-sm btn-danger btn-icon" onclick="showDeleteModal('contact', ${i})">
+                                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Update projets list
+            const projetsList = document.getElementById('projetsList');
+            if (data.projets.length === 0) {
+                projetsList.innerHTML = '<div class="empty-state">Aucun projet</div>';
+            } else {
+                projetsList.innerHTML = data.projets.map((p, i) => `
+                    <div class="list-item">
+                        <div>
+                            <div class="item-name">${p}</div>
+                            <div class="item-meta">${countLiaisons('projet', p)} contact(s)</div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-sm btn-warning btn-icon" onclick="showEditModal('projet', ${i})">
+                                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10z"/></svg>
+                            </button>
+                            <button class="btn btn-sm btn-danger btn-icon" onclick="showDeleteModal('projet', ${i})">
+                                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Update liaisons list
+            const liaisonsList = document.getElementById('liaisonsList');
+            if (data.liaisons.length === 0) {
+                liaisonsList.innerHTML = '<div class="empty-state">Aucune liaison</div>';
+            } else {
+                liaisonsList.innerHTML = data.liaisons.map((l, i) => `
+                    <div class="list-item">
+                        <div>
+                            <div class="item-name">${l.contact}</div>
+                            <div class="item-meta">${l.projet}</div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-sm btn-warning btn-icon" onclick="showEditModal('liaison', ${i})">
+                                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10z"/></svg>
+                            </button>
+                            <button class="btn btn-sm btn-danger btn-icon" onclick="showDeleteModal('liaison', ${i})">
+                                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function countLiaisons(type, value) {
+            if (type === 'contact') {
+                return data.liaisons.filter(l => l.contact === value).length;
+            } else {
+                return data.liaisons.filter(l => l.projet === value).length;
+            }
+        }
+
+        // Modal functions
+        function showAddModal(type) {
+            currentModal = { type, mode: 'add', index: null };
+            document.getElementById('modalTitle').textContent = `Ajouter ${type}`;
+            renderFormFields(type, null);
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function showEditModal(type, index) {
+            currentModal = { type, mode: 'edit', index };
+            document.getElementById('modalTitle').textContent = `Modifier ${type}`;
+
+            let value = null;
+            if (type === 'contact') value = data.contacts[index];
+            else if (type === 'projet') value = data.projets[index];
+            else if (type === 'liaison') value = data.liaisons[index];
+
+            renderFormFields(type, value);
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function renderFormFields(type, value) {
+            const container = document.getElementById('formFields');
+
+            if (type === 'contact' || type === 'projet') {
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label>Nom</label>
+                        <input type="text" id="fieldName" value="${value || ''}" required>
+                    </div>
+                `;
+            } else if (type === 'liaison') {
+                const contactOptions = data.contacts.map(c =>
+                    `<option value="${c}" ${value && value.contact === c ? 'selected' : ''}>${c}</option>`
+                ).join('');
+                const projetOptions = data.projets.map(p =>
+                    `<option value="${p}" ${value && value.projet === p ? 'selected' : ''}>${p}</option>`
+                ).join('');
+
+                container.innerHTML = `
+                    <div class="form-group">
+                        <label>Contact</label>
+                        <select id="fieldContact" required>
+                            <option value="">Selectionner...</option>
+                            ${contactOptions}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Projet</label>
+                        <select id="fieldProjet" required>
+                            <option value="">Selectionner...</option>
+                            ${projetOptions}
+                        </select>
+                    </div>
+                `;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            currentModal = { type: null, mode: null, index: null };
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const { type, mode, index } = currentModal;
+            let action, payload;
+
+            if (type === 'contact' || type === 'projet') {
+                const name = document.getElementById('fieldName').value.trim();
+                if (!name) return;
+
+                action = mode === 'add' ? `add${type.charAt(0).toUpperCase() + type.slice(1)}` : `update${type.charAt(0).toUpperCase() + type.slice(1)}`;
+                payload = mode === 'add' ? { name } : { index, name };
+            } else if (type === 'liaison') {
+                const contact = document.getElementById('fieldContact').value;
+                const projet = document.getElementById('fieldProjet').value;
+                if (!contact || !projet) return;
+
+                action = mode === 'add' ? 'addLiaison' : 'updateLiaison';
+                payload = mode === 'add' ? { contact, projet } : { index, contact, projet };
+            }
+
+            Office.context.ui.messageParent(JSON.stringify({ action, ...payload }));
+            closeModal();
+        }
+
+        // Delete functions
+        function showDeleteModal(type, index) {
+            deleteInfo = { type, index };
+            let name = '';
+            if (type === 'contact') name = data.contacts[index];
+            else if (type === 'projet') name = data.projets[index];
+            else if (type === 'liaison') name = `${data.liaisons[index].contact} - ${data.liaisons[index].projet}`;
+
+            document.getElementById('deleteMessage').textContent = `Voulez-vous vraiment supprimer "${name}" ?`;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            deleteInfo = null;
+        }
+
+        function confirmDelete() {
+            if (!deleteInfo) return;
+
+            const action = `delete${deleteInfo.type.charAt(0).toUpperCase() + deleteInfo.type.slice(1)}`;
+            Office.context.ui.messageParent(JSON.stringify({ action, index: deleteInfo.index }));
+            closeDeleteModal();
+        }
+
+        // Alert function
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
